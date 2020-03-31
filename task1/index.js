@@ -1,8 +1,37 @@
 const mycli = require('commander');
-const { pipeline } = require('stream');
+const { pipeline, Transform } = require('stream');
 const fs = require('fs');
 const DIR_PATH = './task1/';
-let isFile;
+
+const ceaserCipher = (str) => {
+  const upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lowerCase = 'abcdefghijklmnopqrstuvwxyz';
+  const arr = [];
+  for (let i = 0; i < str.length; i += 1) {
+    if (upperCase.indexOf(str[i]) !== -1 || lowerCase.indexOf(str[i]) !== -1) {
+      let index = (upperCase.indexOf(str[i]) !== -1) ? upperCase.indexOf(str[i]) : lowerCase.indexOf(str[i]);
+      if (mycli.actions === 'encode') {
+        index = (index + Number(mycli.shift)) % 26;
+      } else if (mycli.actions === 'decode') {
+        index = (index - Number(mycli.shift)) % 26;
+      } else {
+        arr.push(str[i]);
+      }
+      (upperCase.indexOf(str[i]) !== -1) ? arr.push(upperCase[index]) : arr.push(lowerCase[index]);
+    } else {
+      arr.push(str[i]);
+    }
+  }
+  return arr.join('');
+}
+
+const cipher = new Transform({
+  transform(chunk, encoding, callback) {
+    let resultString = chunk.toString();
+    resultString = ceaserCipher(resultString);
+    callback(null, resultString);
+  }
+})
 
 mycli
   .option('-s, --shift <shift>', `a shift`)
@@ -34,6 +63,7 @@ mycli
         }
         pipeline(
           inpt,
+          cipher,
           outpt,
           (err) => {
             if (err) {
@@ -44,16 +74,5 @@ mycli
       }
     }
   })
-
-  const encodeToRot13 = (str) => {
-    const str1 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    const str2 = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm';
-    const arr = [];
-    for (let i = 0; i < str.length; i += 1) {
-      const index = str1.indexOf(str[i]);
-      arr.push(str2[index]);
-    }
-    return arr.join('');
-  }
 
 mycli.parse(process.argv)
