@@ -1,15 +1,18 @@
-const mycli = require('commander');
+const mycli = require('commander'); // eslint-disable-line
 const { pipeline, Transform } = require('stream');
 const fs = require('fs');
 const DIR_PATH = './task1/';
 
-const ceaserCipher = (str) => {
+const ceaserCipher = str => {
   const upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const lowerCase = 'abcdefghijklmnopqrstuvwxyz';
   const arr = [];
   for (let i = 0; i < str.length; i += 1) {
     if (upperCase.indexOf(str[i]) !== -1 || lowerCase.indexOf(str[i]) !== -1) {
-      let index = (upperCase.indexOf(str[i]) !== -1) ? upperCase.indexOf(str[i]) : lowerCase.indexOf(str[i]);
+      let index =
+        upperCase.indexOf(str[i]) !== -1
+          ? upperCase.indexOf(str[i])
+          : lowerCase.indexOf(str[i]);
       if (mycli.actions === 'encode') {
         index = (index + Number(mycli.shift)) % 26;
       } else if (mycli.actions === 'decode') {
@@ -17,13 +20,17 @@ const ceaserCipher = (str) => {
       } else {
         arr.push(str[i]);
       }
-      (upperCase.indexOf(str[i]) !== -1) ? arr.push(upperCase[index]) : arr.push(lowerCase[index]);
+      if (upperCase.indexOf(str[i]) !== -1) {
+        arr.push(upperCase[index]);
+      } else {
+        arr.push(lowerCase[index]);
+      }
     } else {
       arr.push(str[i]);
     }
   }
   return arr.join('');
-}
+};
 
 const cipher = new Transform({
   transform(chunk, encoding, callback) {
@@ -31,17 +38,17 @@ const cipher = new Transform({
     resultString = ceaserCipher(resultString);
     callback(null, resultString);
   }
-})
+});
 
 mycli
-  .option('-s, --shift <shift>', `a shift`)
-  .option('-a, --actions <action>', `an action encode/decode`)
-  .option('-i, --input [file]', `an input file`)
-  .option('-o, --output [file]', `an output file`)
+  .option('-s, --shift <shift>', 'a shift')
+  .option('-a, --actions <action>', 'an action encode/decode')
+  .option('-i, --input [file]', 'an input file')
+  .option('-o, --output [file]', 'an output file')
   .action(() => {
     if (!mycli.silent) {
       if (!mycli.shift || !mycli.actions) {
-        process.stderr.write("You should pass all mandatory parameters\n");
+        process.stderr.write('You should pass all mandatory parameters\n');
       } else {
         let inpt;
         let outpt;
@@ -49,30 +56,22 @@ mycli
           inpt = process.stdin;
         } else {
           inpt = fs.createReadStream(`${DIR_PATH}${mycli.input}`);
-          inpt.on(
-            'error',
-            () => {
-              process.stderr.write(`${mycli.input} does not exist.\n`);
-            }
-          )
+          inpt.on('error', () => {
+            process.stderr.write(`${mycli.input} does not exist.\n`);
+          });
         }
         if (!mycli.output) {
           outpt = process.stdout;
         } else {
           outpt = fs.createWriteStream(`${DIR_PATH}${mycli.output}`);
         }
-        pipeline(
-          inpt,
-          cipher,
-          outpt,
-          (err) => {
-            if (err) {
-              return
-            } 
+        pipeline(inpt, cipher, outpt, err => {
+          if (err) {
+            return;
           }
-        );
+        });
       }
     }
-  })
+  });
 
-mycli.parse(process.argv)
+mycli.parse(process.argv);
