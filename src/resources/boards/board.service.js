@@ -4,11 +4,17 @@ const getAllBoards = () => boardsRepo.getAllBoards();
 
 const getBoardById = id => boardsRepo.getBoardById(id);
 
-// const createUser = requestBody => usersRepo.createUser(requestBody);
+const createBoard = requestBody => boardsRepo.createBoard(requestBody);
 
-// const updateUser = (userId, requestBody) =>
-//   usersRepo.updateUser(userId, requestBody);
+const updateBoard = (boardid, requestBody) =>
+  boardsRepo.updateBoard(boardid, requestBody);
 
-// const deleteUser = userId => usersRepo.deleteUser(userId);
+const deleteBoard = boardId => boardsRepo.deleteBoard(boardId);
 
-module.exports = { getAllBoards, getBoardById };
+module.exports = {
+  getAllBoards,
+  getBoardById,
+  createBoard,
+  updateBoard,
+  deleteBoard
+};
