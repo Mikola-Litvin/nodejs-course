@@ -1,15 +1,8 @@
+const uuid = require('uuid');
 const Board = require('./board.model');
+const Column = require('../columns/column.model');
 
 const boards = [new Board()];
-// for (let i = 0; i < 3; i += 1) {
-//   const newId = uuid();
-//   users.push({
-//     id: newId,
-//     name: 'USER',
-//     login: 'user',
-//     password: 'P@55w0rd'
-//   });
-// }
 
 const getAllBoards = () => {
   return boards;
@@ -19,34 +12,55 @@ const getBoardById = id => {
   return boards.find(item => item.id === id);
 };
 
-// const createUser = async requestBody => {
-//   const newId = uuid();
-//   users.push({
-//     id: newId,
-//     name: `${requestBody.name}`,
-//     login: `${requestBody.login}`,
-//     password: `${requestBody.password}`
-//   });
-//   return users.map(User.toResponse).find(item => item.id === newId);
-// };
+const createBoard = requestBody => {
+  const listColumns = requestBody.columns.map(
+    item =>
+      new Column({
+        id: uuid(),
+        title: item.title,
+        order: item.order
+      })
+  );
+  boards.push(
+    new Board({
+      id: uuid(),
+      title: requestBody.title,
+      columns: listColumns
+    })
+  );
+  return boards[boards.length - 1];
+};
 
-// const updateUser = async (userId, requestBody) => {
-//   const index = users.indexOf(users.find(item => item.id === userId));
-//   const updatedUser = {
-//     id: userId,
-//     name: `${requestBody.name}`,
-//     login: `${requestBody.login}`,
-//     password: `${requestBody.password}`
-//   };
+const updateBoard = (boardid, requestBody) => {
+  const listColumns = requestBody.columns.map(
+    item =>
+      new Column({
+        id: item.id,
+        title: item.title,
+        order: item.order
+      })
+  );
+  const index = boards.indexOf(boards.find(item => item.id === boardid));
+  const updatedBoard = new Board({
+    id: requestBody.id,
+    title: requestBody.title,
+    columns: listColumns
+  });
 
-//   users.splice(index, 1, updatedUser);
+  boards.splice(index, 1, updatedBoard);
 
-//   return users.map(User.toResponse).find(item => item.id === userId);
-// };
+  return boards.find(item => item.id === requestBody.id);
+};
 
-// const deleteUser = async userId => {
-//   const index = users.indexOf(users.find(item => item.id === userId));
-//   users.splice(index, 1);
-// };
+const deleteBoard = boardId => {
+  const index = boards.indexOf(boards.find(item => item.id === boardId));
+  boards.splice(index, 1);
+};
 
-module.exports = { getAllBoards, getBoardById };
+module.exports = {
+  getAllBoards,
+  getBoardById,
+  createBoard,
+  updateBoard,
+  deleteBoard
+};

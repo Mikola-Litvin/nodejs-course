@@ -29,34 +29,66 @@ const getTaskById = (id, boardID) => {
     .find(item => item.id === id);
 };
 
-// const createUser = async requestBody => {
-//   const newId = uuid();
-//   users.push({
-//     id: newId,
-//     name: `${requestBody.name}`,
-//     login: `${requestBody.login}`,
-//     password: `${requestBody.password}`
-//   });
-//   return users.map(User.toResponse).find(item => item.id === newId);
-// };
+const createTask = requestBody => {
+  const newTask = new Task({
+    id: uuid(),
+    title: requestBody.title,
+    order: requestBody.order,
+    description: requestBody.description,
+    userId: requestBody.userId,
+    boardId: requestBody.boardId,
+    columnId: requestBody.columnId
+  });
+  tasks.push(newTask);
+  return tasks[tasks.length - 1];
+};
 
-// const updateUser = async (userId, requestBody) => {
-//   const index = users.indexOf(users.find(item => item.id === userId));
-//   const updatedUser = {
-//     id: userId,
-//     name: `${requestBody.name}`,
-//     login: `${requestBody.login}`,
-//     password: `${requestBody.password}`
-//   };
+const updateTask = (taskId, boardId, requestBody) => {
+  const index = tasks.indexOf(
+    tasks.find(item => item.id === taskId && item.boardId === boardId)
+  );
+  const updatedTask = new Task({
+    id: requestBody.id,
+    title: requestBody.title,
+    order: requestBody.order,
+    description: requestBody.description,
+    userId: requestBody.userId,
+    boardId: requestBody.boardId,
+    columnId: requestBody.columnId
+  });
 
-//   users.splice(index, 1, updatedUser);
+  tasks.splice(index, 1, updatedTask);
 
-//   return users.map(User.toResponse).find(item => item.id === userId);
-// };
+  return tasks.map(Task.toResponse).find(item => item.id === requestBody.id);
+};
 
-// const deleteUser = async userId => {
-//   const index = users.indexOf(users.find(item => item.id === userId));
-//   users.splice(index, 1);
-// };
+const deleteTask = async (taskId, boardId) => {
+  const index = tasks.indexOf(
+    tasks.find(item => item.id === taskId && item.boardId === boardId)
+  );
+  tasks.splice(index, 1);
+};
 
-module.exports = { getTasksByBoardId, getTaskById };
+const deleteAllTasksByBoardId = boardId => {
+  const tasksList = tasks.filter(item => item.boardId === boardId);
+  tasksList.map(item => {
+    const index = tasks.indexOf(item);
+    tasks.splice(index, 1);
+  });
+};
+
+const removeAssignment = id => {
+  return tasks
+    .filter(item => item.userId === id)
+    .map(item => (item.userId = null));
+};
+
+module.exports = {
+  getTasksByBoardId,
+  getTaskById,
+  createTask,
+  updateTask,
+  deleteTask,
+  deleteAllTasksByBoardId,
+  removeAssignment
+};

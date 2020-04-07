@@ -6,11 +6,6 @@ class Column {
     this.title = title;
     this.order = order;
   }
-
-  // static toResponse(user) {
-  //   const { id, name, login } = user;
-  //   return { id, name, login };
-  // }
 }
 
 module.exports = Column;

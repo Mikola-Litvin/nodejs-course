@@ -4,11 +4,24 @@ const getTasksByBoardId = boardID => tasksRepo.getTasksByBoardId(boardID);
 
 const getTaskById = (id, boardID) => tasksRepo.getTaskById(id, boardID);
 
-// const createUser = requestBody => usersRepo.createUser(requestBody);
+const createTask = requestBody => tasksRepo.createTask(requestBody);
 
-// const updateUser = (userId, requestBody) =>
-//   usersRepo.updateUser(userId, requestBody);
+const updateTask = (taskId, boardId, requestBody) =>
+  tasksRepo.updateTask(taskId, boardId, requestBody);
 
-// const deleteUser = userId => usersRepo.deleteUser(userId);
+const deleteTask = (taskId, boardId) => tasksRepo.deleteTask(taskId, boardId);
 
-module.exports = { getTasksByBoardId, getTaskById };
+const deleteAllTasksByBoardId = boardId =>
+  tasksRepo.deleteAllTasksByBoardId(boardId);
+
+const removeAssignment = id => tasksRepo.removeAssignment(id);
+
+module.exports = {
+  getTasksByBoardId,
+  getTaskById,
+  createTask,
+  updateTask,
+  deleteTask,
+  deleteAllTasksByBoardId,
+  removeAssignment
+};
