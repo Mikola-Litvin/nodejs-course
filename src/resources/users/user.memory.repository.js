@@ -15,7 +15,8 @@ const getAll = () => {
 };
 
 const getUserById = id => {
-  return users.map(User.toResponse).find(item => item.id === id);
+  const user = users.map(User.toResponse).find(item => item.id === id);
+  return user || false;
 };
 
 const createUser = requestBody => {
@@ -31,6 +32,7 @@ const createUser = requestBody => {
 
 const updateUser = (userId, requestBody) => {
   const index = users.indexOf(users.find(item => item.id === userId));
+  if (index === -1) return false;
   const updatedUser = {
     id: userId,
     name: `${requestBody.name}`,
