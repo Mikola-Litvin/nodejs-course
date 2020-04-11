@@ -1,14 +1,14 @@
-### Install Commander.js
+Для логирования используется console.log()
 
-  npm install commander
+Процесс логирования осуществляется единственным модулем (app.js)
 
-### To run app, use following command
+Для проверки обработки и логирования ошибок на событие uncaughtException и событие unhandledRejection
+вставьте в app.js следующий код:
 
-  node ./task1
+setInterval(() => {
+  console.log('Still working...');
+}, 1000);
 
-### Use following options (short alias and full name):
-
-- -s, --shift: a shift (it is necessary option)
-- -a, --action: an action encode/decode (it is necessary option)
-- -i, --input: an input file
-- -o, --output: an output file
+setTimeout(() => {
+  Promise.reject(new Error('Oops!'))
+}, 1500);
