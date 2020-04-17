@@ -3,12 +3,12 @@ const uuid = require('uuid');
 class Task {
   constructor({
     id = uuid(),
-    title = 'Title',
-    order = 0,
-    description = 'Description',
+    title = 'task',
+    order = 1,
+    description = 'description',
     userId = null,
-    boardId = '',
-    columnId = ''
+    boardId = null,
+    columnId = null
   } = {}) {
     this.id = id;
     this.title = title;
@@ -19,9 +19,9 @@ class Task {
     this.columnId = columnId;
   }
 
-  static toResponse(task) {
-    const { id, title, order, description, userId } = task;
-    return { id, title, order, description, userId };
+  static toResponse(user) {
+    const { id, title, order, description, userId, boardId, columnId } = user;
+    return { id, title, order, description, userId, boardId, columnId };
   }
 }
 

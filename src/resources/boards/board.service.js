@@ -1,20 +1,26 @@
+const taskService = require('../tasks/task.memory.repository');
+
 const boardsRepo = require('./board.memory.repository');
 
-const getAllBoards = () => boardsRepo.getAllBoards();
+const getAll = () => boardsRepo.getAll();
 
-const getBoardById = id => boardsRepo.getBoardById(id);
+const getBoard = id => boardsRepo.getBoard(id);
 
-const createBoard = requestBody => boardsRepo.createBoard(requestBody);
+const createBoard = board => boardsRepo.createBoard(board);
 
-const updateBoard = (boardid, requestBody) =>
-  boardsRepo.updateBoard(boardid, requestBody);
+const updateBoard = (id, board) => boardsRepo.updateBoard(id, board);
 
-const deleteBoard = boardId => boardsRepo.deleteBoard(boardId);
+const deleteBoard = async id => {
+  const tasks = await taskService.getAll();
 
-module.exports = {
-  getAllBoards,
-  getBoardById,
-  createBoard,
-  updateBoard,
-  deleteBoard
+  const responses = await Promise.all([
+    ...tasks
+      .filter(item => item.boardId === id)
+      .map(item => taskService.deleteTask(item.id)),
+    boardsRepo.deleteBoard(id)
+  ]);
+
+  return responses[responses.length - 1];
 };
+
+module.exports = { getAll, getBoard, createBoard, updateBoard, deleteBoard };
