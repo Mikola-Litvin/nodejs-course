@@ -60,12 +60,12 @@ app.use((req, res, next) => {
 process.on('uncaughtException', error => {
   console.error(`Captured error: ${error.message}`);
   // eslint-disable-next-line no-process-exit
-  process.exit(1);
+  // process.exit(1);
 });
 
 process.on('unhandledRejection', reason => {
   console.error(`Unhandled rejection detected: ${reason.message}`);
-  throw reason;
+  // throw reason;
 });
 
 app.use('/users', userRouter);
