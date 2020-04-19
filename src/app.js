@@ -1,10 +1,10 @@
-/* eslint-disable no-unused-vars */
 const { finished } = require('stream');
 const express = require('express');
 const swaggerUI = require('swagger-ui-express');
 const path = require('path');
 const YAML = require('yamljs');
 const userRouter = require('./resources/users/user.router');
+const taskRouter = require('./resources/tasks/task.router');
 const boardRouter = require('./resources/boards/board.router');
 
 const app = express();
@@ -16,9 +16,7 @@ app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 app.use('/', (req, res, next) => {
   if (req.originalUrl === '/') {
-    res.send(
-      'Service is running! Read README.md for checking Logging & Error Handling task.'
-    );
+    res.send('Service is running!');
     return;
   }
   next();
@@ -72,14 +70,15 @@ process.on('unhandledRejection', reason => {
 
 app.use('/users', userRouter);
 app.use('/boards', boardRouter);
+app.use('/boards/:boardId/tasks', taskRouter);
 
-app.use((err, req, res, next) => {
-  console.error(err);
-  next(err);
-});
-
-app.use((err, req, res, next) => {
-  res.status(500).send(`${err}`);
+app.use((err, req, res) => {
+  console.error(err.status);
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: err
+  });
 });
 
 module.exports = app;

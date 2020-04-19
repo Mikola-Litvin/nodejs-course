@@ -1,53 +1,35 @@
-const uuid = require('uuid');
 const User = require('./user.model');
 
-const users = [
-  new User({
-    id: uuid(),
-    name: 'USER',
-    login: 'user',
-    password: 'P@55w0rd'
-  })
-];
+const users = new Array(1).fill('').map(() => new User());
 
-const getAll = () => {
+const getAll = async () => {
   return users;
 };
 
-const getUserById = id => {
-  const user = users.map(User.toResponse).find(item => item.id === id);
+const getUser = async id => {
+  const user = users.find(item => item.id === id);
   return user || false;
 };
 
-const createUser = requestBody => {
-  const newId = uuid();
-  users.push({
-    id: newId,
-    name: `${requestBody.name}`,
-    login: `${requestBody.login}`,
-    password: `${requestBody.password}`
-  });
-  return users.map(User.toResponse).find(item => item.id === newId);
+const createUser = async user => {
+  const newUser = new User({ ...user });
+  users.push(newUser);
+  return newUser;
 };
 
-const updateUser = (userId, requestBody) => {
-  const index = users.indexOf(users.find(item => item.id === userId));
+const updateUser = async (id, user) => {
+  const index = users.findIndex(item => item.id === id);
   if (index === -1) return false;
-  const updatedUser = {
-    id: userId,
-    name: `${requestBody.name}`,
-    login: `${requestBody.login}`,
-    password: `${requestBody.password}`
-  };
-
-  users.splice(index, 1, updatedUser);
-
-  return users.map(User.toResponse).find(item => item.id === userId);
+  const newUser = new User({ id, ...user });
+  users[index] = newUser;
+  return newUser;
 };
 
-const deleteUser = userId => {
-  const index = users.indexOf(users.find(item => item.id === userId));
+const deleteUser = async id => {
+  const index = users.findIndex(item => item.id === id);
+  if (index === -1) return false;
   users.splice(index, 1);
+  return true;
 };
 
-module.exports = { getAll, getUserById, createUser, updateUser, deleteUser };
+module.exports = { getAll, getUser, createUser, updateUser, deleteUser };

@@ -1,66 +1,35 @@
-const uuid = require('uuid');
 const Board = require('./board.model');
-const Column = require('../columns/column.model');
 
-const boards = [new Board()];
+const boards = new Array(1).fill('').map(() => new Board());
 
-const getAllBoards = () => {
+const getAll = async () => {
   return boards;
 };
 
-const getBoardById = id => {
-  return boards.find(item => item.id === id);
+const getBoard = async id => {
+  const board = boards.find(item => item.id === id);
+  return board || false;
 };
 
-const createBoard = requestBody => {
-  const listColumns = requestBody.columns.map(
-    item =>
-      new Column({
-        id: uuid(),
-        title: item.title,
-        order: item.order
-      })
-  );
-  boards.push(
-    new Board({
-      id: uuid(),
-      title: requestBody.title,
-      columns: listColumns
-    })
-  );
-  return boards[boards.length - 1];
+const createBoard = async (board = {}) => {
+  const newBoard = new Board({ ...board });
+  boards.push(newBoard);
+  return newBoard;
 };
 
-const updateBoard = (boardid, requestBody) => {
-  const listColumns = requestBody.columns.map(
-    item =>
-      new Column({
-        id: item.id,
-        title: item.title,
-        order: item.order
-      })
-  );
-  const index = boards.indexOf(boards.find(item => item.id === boardid));
-  const updatedBoard = new Board({
-    id: requestBody.id,
-    title: requestBody.title,
-    columns: listColumns
-  });
-
-  boards.splice(index, 1, updatedBoard);
-
-  return boards.find(item => item.id === requestBody.id);
+const updateBoard = async (id, board) => {
+  const index = boards.findIndex(item => item.id === id);
+  if (index === -1) return false;
+  const newBoard = new Board({ id, ...board });
+  boards[index] = newBoard;
+  return newBoard;
 };
 
-const deleteBoard = boardId => {
-  const index = boards.indexOf(boards.find(item => item.id === boardId));
+const deleteBoard = async id => {
+  const index = boards.findIndex(item => item.id === id);
+  if (index === -1) return false;
   boards.splice(index, 1);
+  return true;
 };
 
-module.exports = {
-  getAllBoards,
-  getBoardById,
-  createBoard,
-  updateBoard,
-  deleteBoard
-};
+module.exports = { getAll, getBoard, createBoard, updateBoard, deleteBoard };

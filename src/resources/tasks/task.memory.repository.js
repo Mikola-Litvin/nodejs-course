@@ -1,94 +1,45 @@
-const uuid = require('uuid');
 const Task = require('./task.model');
-const usersService = require('../users/user.service');
-const boardService = require('../boards/board.service');
 
-const users = usersService.getAll();
-const boards = boardService.getAllBoards();
+const tasks = new Array(1).fill('').map(() => new Task());
 
-const tasks = [
-  new Task({
-    id: uuid(),
-    title: 'Title',
-    order: 0,
-    description: 'Description',
-    userId: users[0].id,
-    boardId: boards[0].id,
-    columnId: boards[0].columns[0].id
-  })
-];
-
-const getTasksByBoardId = boardID => {
-  return tasks.filter(item => item.boardId === boardID).map(Task.toResponse);
+const getAll = async () => {
+  return tasks;
 };
 
-const getTaskById = (id, boardID) => {
-  return tasks
-    .filter(item => item.boardId === boardID)
-    .map(Task.toResponse)
-    .find(item => item.id === id);
+const getTasksByBoard = async boardId => {
+  return tasks.filter(item => item.boardId === boardId);
 };
 
-const createTask = requestBody => {
-  const newTask = new Task({
-    id: uuid(),
-    title: requestBody.title,
-    order: requestBody.order,
-    description: requestBody.description,
-    userId: requestBody.userId,
-    boardId: requestBody.boardId,
-    columnId: requestBody.columnId
-  });
+const getTask = async id => {
+  const task = tasks.find(item => item.id === id);
+  return task || false;
+};
+
+const createTask = async (task = {}) => {
+  const newTask = new Task({ ...task });
   tasks.push(newTask);
-  return tasks[tasks.length - 1];
+  return newTask;
 };
 
-const updateTask = (taskId, boardId, requestBody) => {
-  const index = tasks.indexOf(
-    tasks.find(item => item.id === taskId && item.boardId === boardId)
-  );
-  const updatedTask = new Task({
-    id: requestBody.id,
-    title: requestBody.title,
-    order: requestBody.order,
-    description: requestBody.description,
-    userId: requestBody.userId,
-    boardId: requestBody.boardId,
-    columnId: requestBody.columnId
-  });
-
-  tasks.splice(index, 1, updatedTask);
-
-  return tasks.map(Task.toResponse).find(item => item.id === requestBody.id);
+const updateTask = async (boardId, taskId, task) => {
+  const index = tasks.findIndex(item => item.id === taskId);
+  const newTask = { ...tasks[index], ...task };
+  tasks[index] = newTask;
+  return newTask;
 };
 
-const deleteTask = async (taskId, boardId) => {
-  const index = tasks.indexOf(
-    tasks.find(item => item.id === taskId && item.boardId === boardId)
-  );
+const deleteTask = async id => {
+  const index = tasks.findIndex(item => item.id === id);
+  if (index === -1) return false;
   tasks.splice(index, 1);
-};
-
-const deleteAllTasksByBoardId = boardId => {
-  const tasksList = tasks.filter(item => item.boardId === boardId);
-  tasksList.map(item => {
-    const index = tasks.indexOf(item);
-    tasks.splice(index, 1);
-  });
-};
-
-const removeAssignment = id => {
-  return tasks
-    .filter(item => item.userId === id)
-    .map(item => (item.userId = null));
+  return true;
 };
 
 module.exports = {
-  getTasksByBoardId,
-  getTaskById,
+  getAll,
+  getTask,
   createTask,
   updateTask,
   deleteTask,
-  deleteAllTasksByBoardId,
-  removeAssignment
+  getTasksByBoard
 };
