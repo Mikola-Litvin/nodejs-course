@@ -3,6 +3,7 @@ const app = require('./app');
 const mongoose = require('mongoose');
 const User = require('./resources/users/user.model');
 const Board = require('./resources/boards/board.model');
+const Task = require('./resources/tasks/task.model');
 
 const users = new Array(1)
   .fill('')
@@ -21,6 +22,18 @@ const boards = new Array(1).fill('').map(
     })
 );
 
+const tasks = new Array(1).fill('').map(
+  () =>
+    new Task({
+      title: 'task1',
+      order: 0,
+      description: 'description',
+      userId: users[0].id,
+      boardId: boards[0].id,
+      columnId: boards[0].columns[0].id
+    })
+);
+
 mongoose.connect(MONGO_CONNECTION_STRING, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -33,6 +46,7 @@ db.once('open', async () => {
   await db.dropDatabase();
   users.forEach(user => user.save());
   boards.forEach(board => board.save());
+  tasks.forEach(task => task.save());
   app.listen(PORT, () =>
     console.log(`App is running on http://localhost:${PORT}`)
   );

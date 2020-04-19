@@ -145,7 +145,7 @@ describe('Boards suite', () => {
       await request.get(routes.boards.getById(boardId)).expect(404);
     });
 
-    xit("should delete board's tasks upon deletion", async () => {
+    it("should delete board's tasks upon deletion", async () => {
       // Setup:
       const res = await request
         .post(routes.boards.create)
