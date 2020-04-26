@@ -7,7 +7,7 @@ const Task = require('./resources/tasks/task.model');
 
 const users = new Array(1)
   .fill('')
-  .map(() => new User({ name: 'User1', login: 'user1', password: 'qwerty' }));
+  .map(() => new User({ name: 'admin', login: 'admin', password: 'admin' }));
 
 const boards = new Array(1).fill('').map(
   () =>
